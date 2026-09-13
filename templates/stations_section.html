@@ -37,7 +37,7 @@
           {% set active_match = false %}
           {% for match in matches_section.pages | sort(attribute="extra.weight") %}
             {% if match.extra.station is defined and match.extra.station == station_id %}
-              {% if match.extra.status == "in_progress" or (not active_match and match.extra.status == "pending") %}
+              {% if match.extra.status == "in_progress" or active_match == false and match.extra.status == "pending" %}
                 {% set_global active_match = match %}
               {% endif %}
             {% endif %}
