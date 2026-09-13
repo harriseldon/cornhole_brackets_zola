@@ -1,0 +1,117 @@
+tournament_name = "2026 IT Picnic Cornhole Tournament"
+total_teams = 22
+
+[bbq_boys]
+id = "bbq_boys"
+name = "BBQ Boys"
+seed = 1
+
+[integrators]
+id = "integrators"
+name = "Integrators"
+seed = 2
+
+[ill_take_3]
+id = "ill_take_3"
+name = "I'll Take 3 👑"
+seed = 3
+
+[immortal_eas]
+id = "immortal_eas"
+name = "Immortal EAs 🗿"
+seed = 4
+
+[merch_mavericks]
+id = "merch_mavericks"
+name = "Merch Mavericks 🤠"
+seed = 5
+
+[hole_in_one]
+id = "hole_in_one"
+name = "Hole In One 🕳️"
+seed = 6
+
+[diamond_status_bronze_skills]
+id = "diamond_status_bronze_skills"
+name = "Diamond Status, Bronze Skills 💎"
+seed = 7
+
+[scrum_bags]
+id = "scrum_bags"
+name = "Scrum Bags 🛍️"
+seed = 8
+
+[corn_stars]
+id = "corn_stars"
+name = "Corn Stars 🌠"
+seed = 9
+
+[it_integrations]
+id = "it_integrations"
+name = "IT Integrations 🔀"
+seed = 10
+
+[the_cloud_conspirators]
+id = "the_cloud_conspirators"
+name = "The Cloud Conspirators"
+seed = 11
+
+[infrastructure_inferno]
+id = "infrastructure_inferno"
+name = "Infrastructure Inferno 🔥"
+seed = 12
+
+[silk_and_destroy]
+id = "silk_and_destroy"
+name = "Silk and Destroy"
+seed = 13
+
+[bag_to_differ]
+id = "bag_to_differ"
+name = "Bag to Differ"
+seed = 14
+
+[stuffed_and_dangerous]
+id = "stuffed_and_dangerous"
+name = "Stuffed and Dangerous"
+seed = 15
+
+[cultivation_crew]
+id = "cultivation_crew"
+name = "Cultivation Crew"
+seed = 16
+
+[ear_force_one]
+id = "ear_force_one"
+name = "Ear Force One"
+seed = 17
+
+[cornstructors]
+id = "cornstructors"
+name = "Cornstructors"
+seed = 18
+
+[against_the_grain]
+id = "against_the_grain"
+name = "Against the Grain"
+seed = 19
+
+[bag_habits]
+id = "bag_habits"
+name = "Bag Habits"
+seed = 20
+
+[soc_paper_scissors]
+id = "soc_paper_scissors"
+name = "SOC, Paper, Scissors"
+seed = 21
+
+[fleur_mais]
+id = "fleur_mais"
+name = "Fleur Maïs"
+seed = 22
+
+[bye]
+id = "bye"
+name = "Nobody to play 😭"
+seed = 99

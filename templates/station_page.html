@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% set teams = load_data(path="data/teams.toml") %}
+{% set stations = load_data(path="data/stations.toml") %}
+{% set matches_section = get_section(path="brackets/_index.md") %}
+
+{# Extract the current station ID from page.slug or page.extra.station_id #}
+{% set current_station_id = page.slug | default(value=page.extra.station_id | default(value="")) %}
+{% set station_info = stations[current_station_id] | default(value=page) %}
+
+<div class="station-detail-container">
+  <header class="station-nav-header">
+    <a href="{{ get_url(path="stations/") }}" class="back-btn">← Back to All Courts</a>
+    <span class="station-tag">COURT MONITOR</span>
+  </header>
+
+  <div class="station-title-box">
+    <h1 class="court-title">📍 {{ station_info.name | default(value=page.title) }}</h1>
+    {% if station_info.location %}
+      <p class="court-location">Location: {{ station_info.location }}</p>
+    {% endif %}
+  </div>
+
+  {# Check for active or pending matches assigned to this station #}
+  {% set active_match = false %}
+
+  {% for match in matches_section.pages | sort(attribute="extra.weight") %}
+    {% if match.extra.station is defined and match.extra.station == current_station_id %}
+      {% if match.extra.status == "in_progress" or (not active_match and match.extra.status == "pending") %}
+        {% set_global active_match = match %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+
+  {# 1. LIVE / CURRENT COURT SCOREBOARD #}
+  {% if active_match %}
+    {% set team_a_id = active_match.extra.team_a.id | default(value="") %}
+    {% set team_b_id = active_match.extra.team_b.id | default(value="") %}
+
+    {% set team_a_name = teams[team_a_id].name | default(value="TBD") %}
+    {% set team_b_name = teams[team_b_id].name | default(value="TBD") %}
+
+    <div class="live-match-card status-{{ active_match.extra.status }}">
+      <div class="live-header">
+        {% if active_match.extra.status == "in_progress" %}
+          <span class="live-badge pulse-badge">🔴 NOW PLAYING</span>
+        {% else %}
+          <span class="live-badge pending-badge">NEXT UP ON COURT</span>
+        {% endif %}
+        <span class="match-id-badge">MATCH {{ active_match.extra.match_id | upper }} (ROUND {{ active_match.extra.round }})</span>
+      </div>
+
+      <div class="matchup-facing">
+        {# Team A #}
+        <div class="team-column {% if active_match.extra.team_a.is_winner %}is-winner{% endif %}">
+          <span class="team-name">
+            {{ team_a_name }}
+            {% if active_match.extra.team_a.is_winner %}<span class="winner-crown">👑</span>{% endif %}
+          </span>
+          <span class="score-display">{{ active_match.extra.team_a.score | default(value=0) }}</span>
+        </div>
+
+        <div class="versus-divider">VS</div>
+
+        {# Team B #}
+        <div class="team-column {% if active_match.extra.team_b.is_winner %}is-winner{% endif %}">
+          <span class="team-name">
+            {{ team_b_name }}
+            {% if active_match.extra.team_b.is_winner %}<span class="winner-crown">👑</span>{% endif %}
+          </span>
+          <span class="score-display">{{ active_match.extra.team_b.score | default(value=0) }}</span>
+        </div>
+      </div>
+
+      <div class="card-footer-actions">
+        <a href="{{ active_match.permalink }}" class="open-match-btn">Manage / Score Match →</a>
+      </div>
+    </div>
+  {% else %}
+    <div class="court-idle-card">
+      <span class="idle-badge">COURT AVAILABLE</span>
+      <h2>No Active Matches Scheduled</h2>
+      <p>This court currently has no live games assigned.</p>
+    </div>
+  {% endif %}
+
+  {# 2. COURT SCHEDULE & HISTORY TABLE #}
+  <div class="court-schedule-section">
+    <h3>Court Schedule & History</h3>
+    <div class="court-matches-list">
+      {% for match in matches_section.pages | sort(attribute="extra.weight") %}
+        {% if match.extra.station is defined and match.extra.station == current_station_id %}
+          {% set team_a_id = match.extra.team_a.id | default(value="") %}
+          {% set team_b_id = match.extra.team_b.id | default(value="") %}
+          {% set team_a_name = teams[team_a_id].name | default(value="TBD") %}
+          {% set team_b_name = teams[team_b_id].name | default(value="TBD") %}
+
+          <div class="schedule-match-row status-{{ match.extra.status }}">
+            <div class="row-meta">
+              <span class="row-match-id">{{ match.extra.match_id | upper }}</span>
+              <span class="row-round">Round {{ match.extra.round }}</span>
+            </div>
+            <div class="row-teams">
+              <span class="row-team {% if match.extra.team_a.is_winner %}winner{% endif %}">
+                {{ team_a_name }} ({{ match.extra.team_a.score | default(value=0) }})
+              </span>
+              <span class="vs">vs</span>
+              <span class="row-team {% if match.extra.team_b.is_winner %}winner{% endif %}">
+                {{ team_b_name }} ({{ match.extra.team_b.score | default(value=0) }})
+              </span>
+            </div>
+            <div class="row-status">
+              <span class="status-pill status-{{ match.extra.status }}">
+                {{ match.extra.status | replace(from="_", to=" ") | capitalize }}
+              </span>
+              <a href="{{ match.permalink }}" class="row-link">View →</a>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock content %}

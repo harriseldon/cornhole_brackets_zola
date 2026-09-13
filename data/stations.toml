@@ -1,0 +1,41 @@
+total_stations = 10
+
+[the_barnyard]
+id = "the_barnyard"
+name = "The Barnyard"
+
+[the_corn_crib]
+id = "the_corn_crib"
+name = "The Corn Crib"
+
+[the_cornfield]
+id = "the_cornfield"
+name = "The Cornfield"
+
+[the_farmstand]
+id = "the_farmstand"
+name = "The Farmstand"
+
+[the_feed_mill]
+id = "the_feed_mill"
+name = "The Feed Mill"
+
+[the_grain_bin]
+id = "the_grain_bin"
+name = "The Grain Bin"
+
+[the_harvest]
+id = "the_harvest"
+name = "The Harvest"
+
+[the_hayloft]
+id = "the_hayloft"
+name = "The Hayloft"
+
+[the_silo]
+id = "the_silo"
+name = "The Silo"
+
+[the_tractor_shed]
+id = "the_tractor_shed"
+name = "The Tractor Shed"

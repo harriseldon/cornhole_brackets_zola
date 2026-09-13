@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% set teams = load_data(path="data/teams.toml") %}
+{% set stations = load_data(path="data/stations.toml") %}
+{% set matches_section = get_section(path="brackets/_index.md") %}
+
+
+<div class="stations-overview-container">
+  <header class="page-header">
+    <h1>📍 Live Court Stations</h1>
+    <p class="subtitle">Real-time match status and active scoreboards across all tournament courts.</p>
+  </header>
+
+  <div class="court-cards-grid">
+    {% for station_id, station in stations %}
+
+      
+          {# Extract station name safely whether station is a string or a table #}
+          {% if station.name is defined %}
+            {% set station_name = station.name %}
+            {% set station_location = station.location | default(value="") %}
+          {% else %}
+            {% set station_name = station %}
+            {% set station_location = "" %}
+          {% endif %}
+          
+          {% if station.id is defined %}
+            {% set station_id = station.id %}
+          {% endif %}
+          
+          {# Find the compiled Zola page permalink matching this station_id #}
+          {% set target_permalink = station_id | replace(from="_", to="-")  %}
+       
+    
+          {# Find the active or next match assigned to this court #}
+          {% set active_match = false %}
+          {% for match in matches_section.pages | sort(attribute="extra.weight") %}
+            {% if match.extra.station is defined and match.extra.station == station_id %}
+              {% if match.extra.status == "in_progress" or (not active_match and match.extra.status == "pending") %}
+                {% set_global active_match = match %}
+              {% endif %}
+            {% endif %}
+        
+          {% endfor %}
+      {# Ignore any numeric indices or non-map section entries #}
+      {% if station_name  is string and station_name != "_index" %}
+      <div class="court-card {% if active_match and active_match.extra.status == 'in_progress' %}is-active{% endif %}">
+        <div class="court-card-header">
+          <div class="court-identity">
+            <span class="court-badge">COURT</span>
+            <h2 class="court-name">{{ station_name }}</h2>
+          </div>
+          {% if station_location != "" %}
+            <span class="court-location">📍 {{ station_location }}</span>
+          {% endif %}
+            </div>
+    
+            <div class="court-card-body">
+              {% if active_match %}
+                {% set team_a_id = active_match.extra.team_a.id | default(value="") %}
+                {% set team_b_id = active_match.extra.team_b.id | default(value="") %}
+    
+                {% if team_a_id != "" and team_a_id in teams %}
+                  {% set team_a_name = teams[team_a_id].name %}
+                {% else %}
+                  {% set team_a_name = "TBD" %}
+                {% endif %}
+    
+                {% if team_b_id != "" and team_b_id in teams %}
+                  {% set team_b_name = teams[team_b_id].name %}
+                {% else %}
+                  {% set team_b_name = "TBD" %}
+                {% endif %}
+    
+                <div class="match-status-bar">
+                  {% if active_match.extra.status == "in_progress" %}
+                    <span class="status-pill status-in_progress">🔴 IN PROGRESS</span>
+                  {% else %}
+                    <span class="status-pill status-pending">UP NEXT</span>
+                  {% endif %}
+                  <span class="match-id">{{ active_match.extra.match_id | upper }} (R{{ active_match.extra.round }})</span>
+                </div>
+    
+                {# Mini Scoreboard Display #}
+                <div class="mini-scoreboard">
+                  <div class="team-row {% if active_match.extra.team_a.is_winner %}winner{% endif %}">
+                    <span class="team-name" title="{{ team_a_name }}">{{ team_a_name }}</span>
+                    <span class="team-score">{{ active_match.extra.team_a.score | default(value=0) }}</span>
+                  </div>
+                  <div class="team-row {% if active_match.extra.team_b.is_winner %}winner{% endif %}">
+                    <span class="team-name" title="{{ team_b_name }}">{{ team_b_name }}</span>
+                    <span class="team-score">{{ active_match.extra.team_b.score | default(value=0) }}</span>
+                  </div>
+                </div>
+              {% else %}
+                <div class="idle-court-state">
+                  <span class="idle-icon">✅</span>
+                  <p class="idle-text">Court Available</p>
+                  <span class="idle-subtext">No matches currently assigned</span>
+                </div>
+              {% endif %}
+            </div>
+    
+           <div class="court-card-footer">
+             {% if target_permalink != "" %}
+               <a href="{{ "/stations/" ~  target_permalink ~ "/" }}" class="view-court-btn">
+                 Open Court Monitor →
+               </a>
+             {% else %}
+              <span class="view-court-btn" style="opacity: 0.5;">No Page Available</span>
+             {% endif %}
+            </div>
+          </div>
+      {% endif %}
+
+    {% endfor %}
+  </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% set teams = load_data(path="data/teams.toml") %}
+{% set stations = load_data(path="data/stations.toml") %}
+{% set matches_section = get_section(path="brackets/_index.md") %}
+
+<div class="main-container">
+  <h1 class="bracket-title">Interactive Tournament Bracket</h1>
+
+  <div class="bracket-tree-container">
+    {% for r in range(start=1, end=6) %}
+      <div class="bracket-column round-{{ r }}">
+        <div class="column-header">
+          {% if r == 5 %}
+            Championship
+          {% elif r == 4 %}
+            Semifinals
+          {% elif r == 3 %}
+            Quarterfinals
+          {% else %}
+            Round {{ r }}
+          {% endif %}
+        </div>
+
+        <div class="column-matches">
+          {# Sort pages by extra.weight so slots 1..16 align in binary tree order #}
+          {% for page in matches_section.pages | sort(attribute="extra.weight") %}
+            {% if page.extra.round is defined and page.extra.round == r %}
+              
+              {# Extract team IDs safely #}
+              {% set team_a_id = page.extra.team_a.id | default(value="") %}
+              {% set team_b_id = page.extra.team_b.id | default(value="") %}
+
+              {# Safe Team A name lookup #}
+              {% if team_a_id != "" and team_a_id in teams %}
+                {% set team_a_name = teams[team_a_id].name %}
+              {% elif team_a_id == "bye" or page.extra.status == "bye" %}
+                {% set team_a_name = "BYE" %}
+              {% else %}
+                {% set team_a_name = "TBD" %}
+              {% endif %}
+
+              {# Safe Team B name lookup #}
+              {% if team_b_id != "" and team_b_id in teams %}
+                {% set team_b_name = teams[team_b_id].name %}
+              {% elif team_b_id == "bye" or page.extra.status == "bye" %}
+                {% set team_b_name = "BYE" %}
+              {% else %}
+                {% set team_b_name = "TBD" %}
+              {% endif %}
+
+             <div class="bracket-card status-{{ page.extra.status }}">
+                  <div class="card-header">
+                    <span class="match-tag">{{ page.extra.match_id | default(value="--") | upper }}</span>
+                    {% if page.extra.station and page.extra.station in stations %}
+                      <span class="court-tag">📍 {{ stations[page.extra.station].name }}</span>
+                    {% endif %}
+                  </div>
+                
+                  {# Team A Slot #}
+                  <div class="team-slot {% if page.extra.team_a.is_winner %}winner-slot{% endif %}">
+                    <span class="team-name" title="{{ team_a_name }}">{{ team_a_name }}</span>
+                    <span class="score">
+                      {% if page.extra.status == "bye" %}-{% else %}{{ page.extra.team_a.score | default(value=0) }}{% endif %}
+                    </span>
+                  </div>
+                
+                  {# Team B Slot #}
+                  <div class="team-slot {% if page.extra.team_b.is_winner %}winner-slot{% endif %}">
+                    <span class="team-name" title="{{ team_b_name }}">{{ team_b_name }}</span>
+                    <span class="score">
+                      {% if page.extra.status == "bye" %}-{% else %}{{ page.extra.team_b.score | default(value=0) }}{% endif %}
+                    </span>
+                  </div>
+                
+                  {% if page.extra.status != "bye" %}
+                    <a href="{{ page.permalink }}" class="card-overlay-link" aria-label="View match details"></a>
+                  {% endif %}
+                </div>
+
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  {% if page is defined and page.title %}
+    {{ page.title }} | 
+  {% elif section is defined and section.title %}
+    {{ section.title }} | 
+  {% endif %}
+  {{ config.title | default(value="Cornhole Tournament") }}
+</title>
+  {# Link your custom bracket CSS #}
+  <link rel="stylesheet" href="{{ get_url(path="style.css") }}">
+</head>
+<body>
+
+  {# Global Header & Navigation #}
+<header class="site-header">
+  <nav class="nav-container">
+    <a href="{{ get_url(path="/") }}" class="nav-brand">IT 2026 Corn Hole Tournament</a>
+    <ul class="nav-links">
+      <li><a href="{{ get_url(path="/") }}">Interactive Bracket</a></li>
+      <li><a href="{{ get_url(path="brackets/") }}">Schedule & Results</a></li>
+      {# Add the Stations link below #}
+      <li><a href="{{ get_url(path="stations/") }}">Live Stations</a></li>
+    </ul>
+  </nav>
+</header>
+
+  {# Main Bracket / Content Container #}
+  <main class="main-container">
+    {% block content %}
+    {# Child templates (index, section, page) inject their HTML here #}
+    {% endblock content %}
+  </main>
+
+  {# Global Footer #}
+  <footer class="site-footer">
+    <p>Powered by dried Great Northern Beans. All other beans will not do.</p>
+  </footer>
+
+</body>
+</html>

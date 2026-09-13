@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% set teams = load_data(path="data/teams.toml") %}
+{% set stations = load_data(path="data/stations.toml") %}
+{% set matches_section = get_section(path="brackets/_index.md") %}
+
+<div class="matches-dashboard">
+  <h1>Tournament Schedule & Results</h1>
+
+  {# Active Courts Bar #}
+  <section class="active-stations-bar">
+    <h2>Live Courts</h2>
+    <div class="station-grid">
+      {% for page in matches_section.pages %}
+        {% if page.extra.status == "in_progress" and page.extra.station %}
+          {% set station_info = stations[page.extra.station] | default(value="") %}
+          {% set team_a_id = page.extra.team_a.id | default(value="") %}
+          {% set team_b_id = page.extra.team_b.id | default(value="") %}
+          
+          {% if team_a_id != "" and team_a_id in teams %}
+            {% set team_a_name = teams[team_a_id].name %}
+          {% else %}
+            {% set team_a_name = "TBD" %}
+          {% endif %}
+
+          {% if team_b_id != "" and team_b_id in teams %}
+            {% set team_b_name = teams[team_b_id].name %}
+          {% else %}
+            {% set team_b_name = "TBD" %}
+          {% endif %}
+          
+          <div class="station-card active">
+            <span class="court-name">{% if station_info %}{{ station_info.name }}{% else %}{{ page.extra.station }}{% endif %}</span>
+            <div class="court-matchup">
+              {{ team_a_name }} vs {{ team_b_name }}
+            </div>
+            <a href="{{ page.permalink }}" class="live-link">View Live Score</a>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+
+  <hr>
+
+  {# Matches List Grouped by Round #}
+  {% for r in range(start=1, end=6) %}
+    <section class="round-group">
+      <h2>Round {{ r }}</h2>
+      <div class="matches-table">
+        {% for page in matches_section.pages %}
+          {% if page.extra.round == r %}
+            {% set team_a_id = page.extra.team_a.id | default(value="") %}
+            {% set team_b_id = page.extra.team_b.id | default(value="") %}
+        
+            {% if team_a_id != "" and team_a_id in teams %}
+              {% set team_a_name = teams[team_a_id].name %}
+            {% else %}
+              {% set team_a_name = "TBD" %}
+            {% endif %}
+
+            {% if team_b_id != "" and team_b_id in teams %}
+              {% set team_b_name = teams[team_b_id].name %}
+            {% else %}
+              {% set team_b_name = "TBD" %}
+            {% endif %}            
+
+            <div class="match-row status-{{ page.extra.status }}">
+              <span class="match-id">{{ page.extra.match_id | upper }}</span>
+              
+              <span class="station-name">
+                {% if page.extra.station and page.extra.station in stations %}
+                  {{ stations[page.extra.station].name }}
+                {% else %}
+                  Unassigned
+                {% endif %}
+              </span>
+
+              <span class="matchup">
+                <span class="{% if page.extra.team_a.is_winner %}winner{% endif %}">
+                  {{ team_a_name }} ({{ page.extra.team_a.score | default(value=0) }})
+                </span>
+                vs
+                <span class="{% if page.extra.team_b.is_winner %}winner{% endif %}">
+                  {{ team_b_name }} ({{ page.extra.team_b.score | default(value=0) }})
+                </span>
+              </span>
+
+              <span class="status">{{ page.extra.status | capitalize }}</span>
+              <a href="{{ page.permalink }}" class="view-btn">Details →</a>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+</div>
+{% endblock content %}

@@ -1,0 +1,18 @@
+{# -------------------------------------------------------------------------------- -#}
+{# Load highlight.js [https://github.com/highlightjs/highlight.js] -#}
+<link rel="stylesheet" href="{{ get_url(path='lib/highlight.js/highlight.min.css') }}">
+<script src="{{ get_url(path='lib/highlight.js/highlight.min.js') }}"></script>
+{# -------------------------------------------------------------------------------- -#}
+{# Load copy to clipboard plugin [https://github.com/arronhunt/highlightjs-copy] -#}
+<link rel="stylesheet" href="{{ get_url(path='lib/highlightjs-copy/highlightjs-copy.min.css') }}">
+<script src="{{ get_url(path='lib/highlightjs-copy/highlightjs-copy.min.js') }}"></script>
+{# -------------------------------------------------------------------------------- -#}
+{# Custom Files -#}
+{% set custom_css = load_data(path='sass/custom.scss', required=false) -%}
+{% if custom_css -%}
+<link rel="stylesheet" href="{{ get_url(path='custom.css') }}" />
+{% endif -%}
+{% set custom_js = load_data(path='static/custom.js', required=false) -%}
+{% if custom_js -%}
+<script src="{{ get_url(path='custom.js') }}"></script>
+{% endif -%}
